@@ -63,3 +63,47 @@ This repository contains the **official landing page (UI showcase)** of the plat
 ---
 
 ## 📁 Project Structure
+├── index.html
+├── README.md
+
+---
+
+## ⚠️ Disclaimer
+
+This repository contains only the **UI / presentation layer (landing page)**.
+
+The full backend system, payment processing logic, and proprietary infrastructure are **private and not included**.
+
+---
+
+## 👨‍💻 Author
+
+**Ciprian Stefan Plesca**  
+Cybersecurity Expert & Enterprise Architect
+
+🌐 https://localpulse.pro  
+📧 contact@localpulse.pro  
+
+---
+
+## 📄 License
+
+This project is provided for **presentation purposes only**.  
+All rights reserved © LocalPulse.
+
+---
+
+## ⭐ Showcase
+
+This project represents a **high-end fintech architecture concept** combining:
+
+- AI + Payments
+- Cybersecurity
+- Scalable Infrastructure
+- Web3 readiness
+
+---
+
+## 🔥 Tagline
+
+> "Process payments globally. Detect fraud instantly. Scale without limits."
