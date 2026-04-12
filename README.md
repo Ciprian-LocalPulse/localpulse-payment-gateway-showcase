@@ -82,6 +82,7 @@ Cybersecurity Expert & Enterprise Architect
 
 🌐 https://localpulse.pro  
 📧 contact@localpulse.pro  
+https://cal.com/ciprian-stefan-plesca
 
 ---
 
