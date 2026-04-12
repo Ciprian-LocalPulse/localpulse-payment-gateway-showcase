@@ -1,5 +1,4 @@
-# localpulse-payment-gateway-showcase
-Enterprise-grade payment gateway landing page with AI-powered fraud detection, multi-currency support, and modern fintech architecture.
+
 # ⚡ LocalPulse Payment Gateway
 
 Enterprise-grade payment processing platform with AI-powered fraud detection, multi-currency support, and real-time analytics.
