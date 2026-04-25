@@ -1,201 +1,218 @@
 # Security Policy
 
-> **LocalPulse Payment Gateway — Enterprise Edition**  
-> Authored & Maintained by **Ciprian Stefan Plesca** — Cybersecurity Expert & Enterprise Architect  
-> [localpulse.pro](https://localpulse.pro) · [contact@localpulse.pro](mailto:contact@localpulse.pro)  
-> Classification: **CONFIDENTIAL — ENTERPRISE**
+## LocalPulse Payment Gateway™ Security
 
----
-
-## ⚠️ Critical Notice — Payment Security
-
-LocalPulse Payment Gateway processes financial transactions and handles sensitive cardholder data. Security vulnerabilities in payment systems can result in direct financial harm, regulatory penalties, and loss of PCI DSS certification. **We treat all security reports with the utmost urgency and seriousness.**
-
-**If you believe you have discovered a vulnerability, do not attempt to exploit it or access any payment data under any circumstances. Report it immediately through the private channels below.**
-
----
-
-## Table of Contents
-
-- [Supported Versions](#supported-versions)
-- [Reporting a Vulnerability](#reporting-a-vulnerability)
-- [Security Response SLA](#security-response-sla)
-- [Responsible Disclosure Policy](#responsible-disclosure-policy)
-- [Security Architecture](#security-architecture)
-- [PCI DSS Compliance](#pci-dss-compliance)
-- [Out-of-Scope Items](#out-of-scope-items)
-- [Bug Bounty Program](#bug-bounty-program)
+Security is the foundation of everything we build at LocalPulse.pro™. The Payment Gateway handles financial transactions for thousands of enterprise customers, and we hold ourselves to the highest standards of security engineering, disclosure management, and incident response.
 
 ---
 
 ## Supported Versions
 
-| Version | Status | Security Patches | PCI DSS Certified | End of Support |
-|---------|--------|------------------|-------------------|----------------|
-| 2.x     | ✅ **ACTIVE** | Full support | ✅ Yes | TBD |
-| 1.5.x   | ⚠️ Critical only | Critical CVEs only | ⚠️ Expired | 2025-06-30 |
-| 1.x     | ❌ End of Life | None | ❌ No | 2024-12-31 |
+The following versions of the LocalPulse Payment Gateway receive active security patches:
 
-> Only version 2.x is eligible for PCI DSS-compliant deployment. Deploying unsupported versions in a payment environment is a compliance violation.
+| Version | Support Status       | End of Security Support |
+|---------|----------------------|-------------------------|
+| 2.4.x   | ✅ Active (current)  | TBD                     |
+| 2.3.x   | ✅ Security patches  | 2026-12-31              |
+| 2.2.x   | ⚠️ Critical only     | 2026-06-30              |
+| 2.1.x   | ❌ End of life       | 2025-12-31              |
+| < 2.1   | ❌ End of life       | Expired                 |
+
+We strongly recommend all customers run the latest stable release within the `2.4.x` branch.
 
 ---
 
 ## Reporting a Vulnerability
 
-**Never open a public GitHub issue for security vulnerabilities.** Payment system vulnerabilities require immediate private handling.
+**Please do not report security vulnerabilities through public GitHub issues, pull requests, discussion threads, or social media.**
 
-### Primary Reporting Channel
+### Preferred Method: Security Advisory
 
-| Channel | Details |
-|---------|---------|
-| **Security Email** | [contact@localpulse.pro](mailto:contact@localpulse.pro) |
-| **Subject Line** | `[SECURITY] <severity> — <brief description>` |
-| **Response Time** | See SLA table below |
-| **Encryption** | PGP key available on request |
-| **Enterprise Consultation** | [cal.com/ciprian-stefan-plesca](https://cal.com/ciprian-stefan-plesca) |
+Use GitHub's private [Security Advisory](../../security/advisories/new) feature to report vulnerabilities confidentially. This is our preferred channel.
 
-### What to Include
+### Alternative: Encrypted Email
+
+If you cannot use GitHub Security Advisories, email us at:
+
+**security@localpulse.pro**
+
+Encrypt sensitive reports using our PGP key:
 
 ```
-1. Vulnerability classification (CWE / OWASP category if known)
-2. Affected component (UI layer, API endpoint, integration)
-3. Severity self-assessment (Critical / High / Medium / Low)
-4. Step-by-step reproduction instructions
-5. Proof-of-concept (code, screenshots, HTTP traces)
-6. Data or systems potentially exposed
-7. Recommended remediation
-8. Whether live payment data was accessed (critical — disclose immediately)
-9. Your contact information for follow-up
+Key ID:       0xA1B2C3D4E5F6A7B8
+Fingerprint:  A1B2 C3D4 E5F6 A7B8 9C0D 1E2F 3A4B 5C6D 7E8F 9A0B
+Download:     https://localpulse.pro/.well-known/pgp-key.asc
 ```
 
----
+### Responsible Disclosure Program
 
-## Security Response SLA
+We operate a responsible disclosure program. We kindly ask that you:
 
-| Severity | Criteria | Initial Response | Patch Target | Disclosure |
-|----------|----------|-----------------|--------------|------------|
-| **P0 — Emergency** | Live payment data exposed; active exploitation in production | **30 minutes** | 4 hours | Post-remediation only |
-| **P1 — Critical** | Authentication bypass; cardholder data exposure; RCE | **1 hour** | 24 hours | 30 days post-patch |
-| **P2 — High** | Privilege escalation; payment manipulation; PII leak | **4 hours** | 72 hours | 60 days post-patch |
-| **P3 — Medium** | Logic flaw; insecure config; data leakage | **24 hours** | 14 days | 90 days post-patch |
-| **P4 — Low** | Best-practice deviation; informational | **72 hours** | 30 days | Coordinated |
+1. **Give us reasonable time** — Allow at least 90 days for us to investigate and deploy a fix before any public disclosure
+2. **Avoid accessing customer data** — Do not read, modify, or exfiltrate any real customer payment or PII data during research
+3. **Do not disrupt services** — Avoid denial-of-service testing or any action that degrades service for our customers
+4. **Test only in sandbox** — Conduct all research in the sandbox environment (`payments-sandbox.localpulse.pro`)
+5. **Report in good faith** — Provide enough detail for us to reproduce and validate the issue
 
-> P0 and P1 incidents trigger automatic notification to our PCI DSS QSA (Qualified Security Assessor) and legal counsel.
+In return, we commit to:
 
----
-
-## Responsible Disclosure Policy
-
-We operate a **coordinated disclosure** model with the following commitments:
-
-**We commit to:**
-- Acknowledging your report within the SLA above — guaranteed.
-- Keeping you informed of validation, remediation progress, and deployment status.
-- Not pursuing legal action against good-faith researchers following this policy.
-- Publicly crediting researchers who disclose responsibly (with their consent).
-- Processing any applicable bug bounty reward within 30 days of fix deployment.
-
-**We ask researchers to:**
-- Report through the private channel above — never publicly before a fix is deployed.
-- **Never access, modify, or exfiltrate any payment or cardholder data** beyond what is strictly necessary to demonstrate the vulnerability. Any unauthorized access to financial data may trigger legal obligations regardless of research intent.
-- Not attempt to execute transactions, initiate refunds, or manipulate payment flows in any production environment.
-- Allow the full response SLA period before escalating or disclosing.
-- Comply with all applicable laws in your jurisdiction.
-
----
-
-## Security Architecture
-
-### Cardholder Data Environment (CDE)
-
-The CDE is governed by PCI DSS Level 1 requirements and is entirely separate from this repository. This repository contains **only the UI / presentation layer** and does not include any code that processes, stores, or transmits cardholder data.
-
-### Core Security Controls
-
-| Control Domain | Implementation |
-|----------------|---------------|
-| **Encryption at Rest** | AES-256 for all sensitive data; HSM-managed keys |
-| **Encryption in Transit** | TLS 1.3 exclusively; TLS 1.2 and below rejected |
-| **Authentication** | OAuth 2.0 · API key + HMAC · mTLS for service-to-service |
-| **Tokenization** | PAN tokenization — card numbers never stored in application layer |
-| **Secrets Management** | HashiCorp Vault · AWS KMS — no hardcoded credentials, ever |
-| **WAF** | Cloudflare Enterprise WAF with custom payment-specific rulesets |
-| **DDoS Protection** | Multi-layer, volumetric + application-layer protection |
-| **Fraud Detection** | Real-time ML scoring — TensorFlow · Scikit-learn · <10ms inference |
-| **Audit Logging** | Immutable audit trail for all transactions, API calls, and admin actions |
-| **Access Control** | Zero-trust, least-privilege RBAC; MFA enforced for all personnel |
-| **Penetration Testing** | Quarterly external pen tests by approved PCI DSS QSA vendors |
-| **SIEM** | Real-time anomaly detection with PagerDuty alerting |
-
-### Webhook Security
-
-All outbound webhooks are secured with:
-- HMAC-SHA256 payload signature (`X-LocalPulse-Signature-256` header)
-- Timestamp included in signature to prevent replay attacks
-- TLS 1.3 minimum on delivery endpoint
-- Idempotency keys to prevent duplicate processing
-- Retry with exponential back-off and dead letter queue
-
----
-
-## PCI DSS Compliance
-
-LocalPulse Payment Gateway maintains **PCI DSS Level 1** certification — the highest tier, required for processors handling over 6 million transactions annually.
-
-| PCI DSS Requirement | Status | Notes |
-|---------------------|--------|-------|
-| Req 1–2: Network Security | ✅ Certified | Segmented CDE, WAF enforced |
-| Req 3–4: Data Protection | ✅ Certified | Tokenization, AES-256, TLS 1.3 |
-| Req 5–6: Vulnerability Management | ✅ Certified | Quarterly scans, patch SLAs |
-| Req 7–8: Access Control | ✅ Certified | RBAC, MFA, PAM |
-| Req 9: Physical Security | ✅ Certified | SOC 2 Type II data centers |
-| Req 10: Logging & Monitoring | ✅ Certified | Immutable audit logs, SIEM |
-| Req 11: Security Testing | ✅ Certified | Quarterly pen tests, ASV scans |
-| Req 12: Policy Management | ✅ Certified | Annual QSA audit cycle |
-
-> Report on Compliance (RoC) and Attestation of Compliance (AoC) available to enterprise partners under NDA. Contact [contact@localpulse.pro](mailto:contact@localpulse.pro).
-
----
-
-## Out-of-Scope Items
-
-The following are **explicitly excluded** from security review scope:
-
-- Social engineering, phishing, or physical attacks against personnel.
-- Denial-of-service or stress-testing attacks against any endpoint.
-- Attacks requiring man-in-the-middle interception of third-party payment networks (Visa, Mastercard, SWIFT).
-- Vulnerabilities in third-party processors or banking partners outside our control.
-- Rate limiting bypass without demonstrated financial impact.
-- Missing security headers on non-sensitive, public-facing static content only.
-- Findings from automated scanners submitted without a verified, manual proof-of-concept.
-- Versions designated End of Life (see Supported Versions table).
-- Testing conducted in production environments without prior written authorization.
+- Acknowledging your report within **2 business days**
+- Providing an initial severity assessment within **5 business days**
+- Keeping you informed throughout the remediation process
+- Crediting you publicly (if you wish) upon fix release
+- Not pursuing legal action against good-faith researchers
 
 ---
 
 ## Bug Bounty Program
 
-LocalPulse operates a private bug bounty program for authorized security researchers.
+LocalPulse.pro™ runs a private bug bounty program for security researchers. Rewards are based on severity and impact:
 
-| Severity | Reward Range |
-|----------|-------------|
-| P0 — Emergency | €5,000 – €25,000 |
-| P1 — Critical | €2,000 – €10,000 |
-| P2 — High | €500 – €2,000 |
-| P3 — Medium | €100 – €500 |
-| P4 — Low | Recognition + swag |
+| CVSS Score | Severity | Reward Range |
+|------------|----------|--------------|
+| 9.0 – 10.0 | Critical | $5,000 – $15,000 |
+| 7.0 – 8.9  | High     | $1,500 – $5,000  |
+| 4.0 – 6.9  | Medium   | $250 – $1,500    |
+| 0.1 – 3.9  | Low / Info | $50 – $250     |
 
-> To apply for bug bounty authorization, contact [contact@localpulse.pro](mailto:contact@localpulse.pro) with your security research background. Unauthorized testing is not eligible for rewards and may violate applicable law.
+To join the private program, contact **security@localpulse.pro** with:
+- Your research background and prior CVEs (if any)
+- Your preferred contact method
+- Confirmation that you have read and accept these guidelines
+
+### In-Scope Targets
+
+- `payments.localpulse.pro` — Production payment API
+- `payments-sandbox.localpulse.pro` — Sandbox environment (preferred)
+- `app.localpulse.pro` — Dashboard and merchant portal
+- `@localpulse/payment-gateway` NPM package
+- `localpulse-payments` PyPI package
+
+### Out-of-Scope
+
+- Third-party processor infrastructure (Stripe, Adyen, PayPal)
+- Denial of service or volumetric attacks
+- Physical security attacks
+- Social engineering of LocalPulse employees
+- Issues in unsupported versions (< 2.2.x)
+- Self-XSS without a realistic attack vector
+- Rate limit bypasses that require authenticated access to trigger
+- Missing security headers with no demonstrated exploitability
+- Issues requiring physical access to a victim's device
 
 ---
 
-## Hall of Acknowledgement
+## Security Architecture
 
-We thank the following security researchers for responsible disclosure:
+### PCI DSS Level 1 Compliance
 
-*No entries yet — be the first.*
+The LocalPulse Payment Gateway™ is a **PCI DSS Level 1** certified service provider — the highest certification level for payment card processing. Our annual Report on Compliance (ROC) is conducted by a Qualified Security Assessor (QSA).
+
+Key controls include:
+
+- **No raw PANs stored** — All card data is immediately tokenized on ingress
+- **Isolated cardholder data environment (CDE)** — Network-segmented from all other systems
+- **Point-to-point encryption (P2PE)** — Card data encrypted from capture to processor
+- **Quarterly ASV scans** — Approved Scanning Vendor external vulnerability scans
+- **Annual penetration tests** — By independent third-party security firm
+
+### Tokenization & Vaulting
+
+Raw card numbers (PANs) never touch LocalPulse servers. Our tokenization flow:
+
+```
+Customer Card Input
+       ↓
+  [TLS 1.3 Encrypted]
+       ↓
+  LocalPulse Vault (isolated CDE)
+       ↓  
+  Token generated (lp_tok_xxxx)
+       ↓
+  Processor-specific token created
+       ↓
+  Application layer receives only tokens
+```
+
+Vault encryption uses **AES-256-GCM** with keys managed via HSM (Hardware Security Module). Key rotation occurs every 90 days.
+
+### Authentication & Authorization
+
+- **API Keys** — HMAC-SHA256 signed, scoped to specific permissions
+- **Webhook signatures** — HMAC-SHA256 with timestamp anti-replay protection
+- **Dashboard** — SAML 2.0 / OIDC SSO + TOTP MFA enforcement
+- **Internal access** — Zero-trust network with mutual TLS (mTLS) between services
+- **Service accounts** — Short-lived credentials via Vault's dynamic secrets engine
+
+### Fraud Detection
+
+Real-time ML-based fraud scoring on every transaction:
+
+- Behavioral velocity checks (card, device, IP, customer)
+- Device fingerprinting and browser signals
+- Geographic anomaly detection
+- BIN-level risk assessment
+- 3D Secure 2.0 triggered automatically above configurable risk threshold
+- Manual review queue for high-risk transactions
+
+### Encryption Standards
+
+| Data State | Standard |
+|------------|----------|
+| In transit | TLS 1.3 minimum; TLS 1.2 for legacy processors |
+| At rest (card data) | AES-256-GCM via HSM |
+| At rest (PII) | AES-256-CBC with envelope encryption |
+| Backups | AES-256 with separate key hierarchy |
+| API keys | PBKDF2-SHA256 with 600,000 iterations |
+
+### Penetration Testing
+
+We engage independent security firms for:
+
+- **Annual full-scope penetration test** — Network, application, and social engineering
+- **Quarterly application security review** — OWASP Top 10 focused
+- **Continuous automated scanning** — DAST integrated into CI/CD pipeline
+- **Red team exercises** — Annual adversarial simulation
+
+Penetration test summaries are available to enterprise customers under NDA.
 
 ---
 
-*© 2026 Ciprian Stefan Plesca · LocalPulse Payment Gateway · All Rights Reserved*  
-*PCI DSS Level 1 · SOC 2 Type II · ISO 27001*
+## Incident Response
+
+### Severity Definitions
+
+| Severity | Definition | Response Time |
+|----------|------------|---------------|
+| P0 — Critical | Active breach, data exfiltration, or service compromise | Immediate (24/7) |
+| P1 — High | Potential breach, privilege escalation, auth bypass | 2 hours |
+| P2 — Medium | Vulnerability with limited exploitability or impact | 24 hours |
+| P3 — Low | Hardening opportunity or informational finding | 5 business days |
+
+### Notification Commitments
+
+In the event of a security incident affecting customer data:
+
+- **Initial notification** within 72 hours of confirmed breach (GDPR requirement)
+- **Detailed incident report** within 14 days
+- **Post-mortem and remediation summary** within 30 days
+
+Enterprise customers with active support agreements receive direct communication from our security team.
+
+---
+
+## Security Contact
+
+| Channel | Contact |
+|---------|---------|
+| Security disclosures | security@localpulse.pro |
+| Incident response (enterprise) | incident-response@localpulse.pro |
+| PGP key | https://localpulse.pro/.well-known/pgp-key.asc |
+| Bug bounty | security@localpulse.pro (subject: Bug Bounty) |
+| Schedule consultation | https://cal.com/ciprian-stefan-plesca |
+
+---
+
+*Last reviewed: April 2026 — Security Team, LocalPulse.pro™*
+
+*© 2026 Ciprian Stefan Plesca. All rights reserved.*

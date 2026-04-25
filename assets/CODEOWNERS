@@ -1,0 +1,131 @@
+# CODEOWNERS — LocalPulse Payment Gateway™
+#
+# This file defines ownership of code within the repository.
+# Owners are automatically requested as reviewers on pull requests
+# that modify files matching their patterns.
+#
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Order matters: the LAST matching pattern takes precedence.
+# Format: <pattern> <owner> [<owner> ...]
+#
+# Last updated: April 2026
+
+# ─── Default: Engineering Lead reviews everything ───────────────────────────
+*                                   @localpulse-pro/engineering-lead
+
+# ─── Repository governance files ────────────────────────────────────────────
+CODEOWNERS                          @localpulse-pro/engineering-lead @localpulse-pro/security-lead
+GOVERNANCE.md                       @localpulse-pro/engineering-lead
+LICENSE.md                          @localpulse-pro/engineering-lead
+SECURITY.md                         @localpulse-pro/security-lead @localpulse-pro/engineering-lead
+
+# ─── Core payment processing (Payment-Critical — requires 2 reviews) ────────
+/src/charges/                       @localpulse-pro/payments-core @localpulse-pro/security-lead
+/src/refunds/                       @localpulse-pro/payments-core @localpulse-pro/security-lead
+/src/captures/                      @localpulse-pro/payments-core @localpulse-pro/security-lead
+/src/authorization/                 @localpulse-pro/payments-core @localpulse-pro/security-lead
+
+# ─── Tokenization & Vault (Most sensitive — requires Security Lead review) ──
+/src/vault/                         @localpulse-pro/security-lead @localpulse-pro/payments-core
+/src/tokenization/                  @localpulse-pro/security-lead @localpulse-pro/payments-core
+/src/encryption/                    @localpulse-pro/security-lead
+
+# ─── Fraud & Risk (requires Security Lead review) ───────────────────────────
+/src/fraud/                         @localpulse-pro/security-lead @localpulse-pro/risk-team
+/src/risk/                          @localpulse-pro/security-lead @localpulse-pro/risk-team
+/src/3ds/                           @localpulse-pro/security-lead @localpulse-pro/payments-core
+
+# ─── Authentication & Authorization ─────────────────────────────────────────
+/src/auth/                          @localpulse-pro/security-lead @localpulse-pro/platform-team
+/src/api-keys/                      @localpulse-pro/security-lead @localpulse-pro/platform-team
+/src/webhooks/signature/            @localpulse-pro/security-lead
+
+# ─── Processor Connectors ───────────────────────────────────────────────────
+/src/processors/stripe/             @localpulse-pro/payments-core @localpulse-pro/integrations-team
+/src/processors/adyen/              @localpulse-pro/payments-core @localpulse-pro/integrations-team
+/src/processors/paypal/             @localpulse-pro/payments-core @localpulse-pro/integrations-team
+/src/processors/braintree/          @localpulse-pro/payments-core @localpulse-pro/integrations-team
+/src/processors/ach/                @localpulse-pro/payments-core @localpulse-pro/integrations-team
+/src/routing/                       @localpulse-pro/payments-core @localpulse-pro/engineering-lead
+
+# ─── Subscription & Billing ─────────────────────────────────────────────────
+/src/subscriptions/                 @localpulse-pro/billing-team
+/src/invoicing/                     @localpulse-pro/billing-team
+/src/dunning/                       @localpulse-pro/billing-team
+/src/pricing/                       @localpulse-pro/billing-team
+/src/tax/                           @localpulse-pro/billing-team @localpulse-pro/finance-team
+
+# ─── Webhooks & Event System ────────────────────────────────────────────────
+/src/webhooks/                      @localpulse-pro/platform-team
+/src/events/                        @localpulse-pro/platform-team
+
+# ─── API Layer ──────────────────────────────────────────────────────────────
+/src/api/                           @localpulse-pro/platform-team
+/src/api/v1/                        @localpulse-pro/platform-team   # Deprecated; monitor for removal
+/src/middleware/                    @localpulse-pro/platform-team @localpulse-pro/security-lead
+/src/rate-limiting/                 @localpulse-pro/platform-team @localpulse-pro/security-lead
+
+# ─── Data & Storage ─────────────────────────────────────────────────────────
+/src/database/                      @localpulse-pro/platform-team @localpulse-pro/engineering-lead
+/src/database/migrations/           @localpulse-pro/engineering-lead
+/src/cache/                         @localpulse-pro/platform-team
+
+# ─── Dispute & Chargeback Management ────────────────────────────────────────
+/src/disputes/                      @localpulse-pro/payments-core @localpulse-pro/risk-team
+/src/chargebacks/                   @localpulse-pro/payments-core @localpulse-pro/risk-team
+
+# ─── Reporting & Analytics ──────────────────────────────────────────────────
+/src/reporting/                     @localpulse-pro/platform-team
+/src/analytics/                     @localpulse-pro/platform-team
+/src/reconciliation/                @localpulse-pro/finance-team @localpulse-pro/payments-core
+
+# ─── SDKs & Client Libraries ────────────────────────────────────────────────
+/sdk/node/                          @localpulse-pro/sdk-team
+/sdk/python/                        @localpulse-pro/sdk-team
+/sdk/go/                            @localpulse-pro/sdk-team
+/sdk/java/                          @localpulse-pro/sdk-team
+/sdk/php/                           @localpulse-pro/sdk-team
+
+# ─── Infrastructure & Deployment ────────────────────────────────────────────
+/infra/                             @localpulse-pro/infrastructure-team @localpulse-pro/engineering-lead
+/infra/terraform/                   @localpulse-pro/infrastructure-team
+/infra/kubernetes/                  @localpulse-pro/infrastructure-team
+/infra/helm/                        @localpulse-pro/infrastructure-team
+Dockerfile                          @localpulse-pro/infrastructure-team
+docker-compose*.yml                 @localpulse-pro/infrastructure-team
+
+# ─── CI/CD ──────────────────────────────────────────────────────────────────
+/.github/workflows/                 @localpulse-pro/engineering-lead @localpulse-pro/infrastructure-team
+/.github/workflows/security*.yml    @localpulse-pro/security-lead @localpulse-pro/engineering-lead
+
+# ─── Security Configuration ─────────────────────────────────────────────────
+/.snyk                              @localpulse-pro/security-lead
+/.trivyignore                       @localpulse-pro/security-lead
+/config/security/                   @localpulse-pro/security-lead
+/config/tls/                        @localpulse-pro/security-lead
+
+# ─── Configuration & Environment ────────────────────────────────────────────
+/config/                            @localpulse-pro/engineering-lead
+*.env.example                       @localpulse-pro/engineering-lead @localpulse-pro/security-lead
+/config/routing.yaml                @localpulse-pro/payments-core @localpulse-pro/engineering-lead
+
+# ─── Tests ──────────────────────────────────────────────────────────────────
+/test/unit/                         @localpulse-pro/platform-team
+/test/integration/                  @localpulse-pro/platform-team
+/test/e2e/                          @localpulse-pro/qa-lead
+/test/security/                     @localpulse-pro/security-lead
+/test/pci/                          @localpulse-pro/security-lead @localpulse-pro/qa-lead
+
+# ─── Documentation ──────────────────────────────────────────────────────────
+/docs/                              @localpulse-pro/platform-team
+/docs/adr/                          @localpulse-pro/engineering-lead
+/docs/PCI_SCOPE.md                  @localpulse-pro/security-lead @localpulse-pro/engineering-lead
+README.md                           @localpulse-pro/engineering-lead
+CHANGELOG.md                        @localpulse-pro/engineering-lead
+
+# ─── Package & Dependency Management ────────────────────────────────────────
+package.json                        @localpulse-pro/engineering-lead
+package-lock.json                   @localpulse-pro/engineering-lead
+requirements*.txt                   @localpulse-pro/engineering-lead
+pyproject.toml                      @localpulse-pro/engineering-lead

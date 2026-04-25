@@ -1,0 +1,26 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/localpulse-pro/payment-gateway/security/advisories/new
+    about: Report a security vulnerability via private Security Advisory. DO NOT use public issues for security reports.
+
+  - name: 🚨 Production Outage / Payment Failure
+    url: https://support.localpulse.pro/new
+    about: For production payment processing outages, use the support portal or call the emergency line. Do not use GitHub issues for production incidents.
+
+  - name: 📚 Documentation
+    url: https://docs.localpulse.pro/payment
+    about: LocalPulse Payment Gateway™ documentation, API reference, and integration guides.
+
+  - name: 💬 Support Portal
+    url: https://support.localpulse.pro
+    about: Open a support ticket for integration issues, billing questions, or general inquiries.
+
+  - name: 📅 Schedule a Consultation
+    url: https://cal.com/ciprian-stefan-plesca
+    about: Schedule a consultation with Ciprian Stefan Plesca for enterprise inquiries, partnerships, or strategic discussions.
+
+  - name: 📊 System Status
+    url: https://status.localpulse.pro
+    about: Check real-time status of the LocalPulse Payment Gateway™ and related services.

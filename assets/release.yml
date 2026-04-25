@@ -1,0 +1,259 @@
+name: Release — LocalPulse Payment Gateway™
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write   # For OIDC-based signing
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: localpulse-pro/payment-gateway
+
+jobs:
+  # ─── Validate Release ─────────────────────────────────────────────────────
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+      is_prerelease: ${{ steps.parse.outputs.is_prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse version tag
+        id: parse
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          if [[ "$TAG" == *"-rc."* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+          echo "Releasing version: $TAG"
+
+      - name: Verify CHANGELOG entry
+        run: |
+          VERSION="${{ steps.parse.outputs.version }}"
+          if ! grep -q "\[$VERSION\]" CHANGELOG.md; then
+            echo "❌ No CHANGELOG entry found for version $VERSION"
+            echo "Add an entry to CHANGELOG.md before releasing."
+            exit 1
+          fi
+          echo "✅ CHANGELOG entry found for $VERSION"
+
+      - name: Verify package.json version matches tag
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ steps.parse.outputs.version }}"
+          if [[ "$PKG_VERSION" != "$TAG_VERSION" ]]; then
+            echo "❌ package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
+            exit 1
+          fi
+          echo "✅ Version match confirmed: $PKG_VERSION"
+
+  # ─── Full Test Suite ─────────────────────────────────────────────────────
+  test:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+    needs: validate
+    environment: sandbox
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: lp_gateway_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full test suite
+        run: npm run test:all
+        env:
+          LP_ENVIRONMENT: sandbox
+          LP_PAYMENT_API_KEY: ${{ secrets.SANDBOX_API_KEY }}
+          DATABASE_URL: postgresql://postgres:testpassword@localhost:5432/lp_gateway_test
+          REDIS_URL: redis://localhost:6379
+
+  # ─── Security Sign-off ───────────────────────────────────────────────────
+  security-signoff:
+    name: Security Pre-Release Check
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Final security audit
+        run: npm audit --audit-level=high
+
+      - name: Run security tests
+        run: npm run test:security
+
+      - name: PCI compliance check
+        run: npm run test:pci
+
+  # ─── Build & Push Container ──────────────────────────────────────────────
+  build-and-push:
+    name: Build & Push Container Image
+    runs-on: ubuntu-latest
+    needs: [test, security-signoff]
+    outputs:
+      image-digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,prefix=sha-
+
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true   # Generate SBOM for supply chain security
+
+      - name: Sign the container image (Cosign)
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image
+        run: |
+          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+
+  # ─── Publish NPM Package ─────────────────────────────────────────────────
+  publish-npm:
+    name: Publish NPM Package
+    runs-on: ubuntu-latest
+    needs: [test, security-signoff]
+    if: ${{ needs.validate.outputs.is_prerelease == 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js with NPM registry
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish to NPM
+        run: npm publish --access restricted
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # ─── Create GitHub Release ───────────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-and-push, publish-npm]
+    if: always() && needs.build-and-push.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          # Extract the section for this version from CHANGELOG.md
+          NOTES=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | head -n -1 | tail -n +2)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "LocalPulse Payment Gateway™ v${{ needs.validate.outputs.version }}"
+          body: |
+            ## LocalPulse Payment Gateway™ v${{ needs.validate.outputs.version }}
+
+            ${{ steps.changelog.outputs.notes }}
+
+            ---
+
+            ### Container Image
+
+            ```bash
+            docker pull ghcr.io/localpulse-pro/payment-gateway:${{ needs.validate.outputs.version }}
+            ```
+
+            Signed image digest: `${{ needs.build-and-push.outputs.image-digest }}`
+
+            ### NPM Package
+
+            ```bash
+            npm install @localpulse/payment-gateway@${{ needs.validate.outputs.version }}
+            ```
+
+            ---
+
+            **Full Changelog:** https://github.com/localpulse-pro/payment-gateway/blob/main/CHANGELOG.md
+
+            © 2026 Ciprian Stefan Plesca · LocalPulse.pro™
+          draft: false
+          prerelease: ${{ needs.validate.outputs.is_prerelease == 'true' }}
+          make_latest: ${{ needs.validate.outputs.is_prerelease == 'false' }}
